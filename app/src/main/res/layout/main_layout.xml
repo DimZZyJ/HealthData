@@ -3,21 +3,19 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
     <LinearLayout
-        android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center">
+        android:layout_gravity="center"
+        android:orientation="vertical">
         <TextView
             android:id="@+id/heartRateTextView"
             android:textColor="@android:color/white"
-            android:text="Сердце"
             android:textAlignment="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"/>
         <TextView
-            android:id="@+id/presureTextView"
+            android:id="@+id/pressureTextView"
             android:textColor="@android:color/white"
-            android:text="Давление"
             android:textAlignment="center"
             android:layout_width="match_parent"
             android:layout_height="wrap_content" />

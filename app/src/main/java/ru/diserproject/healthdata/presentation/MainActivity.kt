@@ -18,6 +18,7 @@ class MainActivity : ComponentActivity(),SensorEventListener {
     //Sensors
     private var heartSensor: Sensor? = null
     private var presureSensor: Sensor? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
@@ -26,8 +27,8 @@ class MainActivity : ComponentActivity(),SensorEventListener {
         setTheme(android.R.style.Theme_DeviceDefault)
         setContentView(R.layout.main_layout)
 
-        heartTextView = findViewById<TextView>(R.id.heartRateTextView)
-        presureTextView = findViewById<TextView>(R.id.presureTextView)
+        heartTextView = findViewById(R.id.heartRateTextView)
+        presureTextView = findViewById(R.id.pressureTextView)
 
         setUpSensor()
     }
@@ -40,15 +41,15 @@ class MainActivity : ComponentActivity(),SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_HEART_RATE){
-            heartTextView.text = "Пульс: ${event.values[0].toString()}"
+            heartTextView.text = "Пульс: ${event.values[0]}"
         }
         if (event?.sensor?.type == Sensor.TYPE_PRESSURE){
-            presureTextView.text = "Атм.Дав: ${event.values[0].toString()}"
+            presureTextView.text = "Атм.Дав: ${event.values[0]}"
         }
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
-        heartTextView.text = "Расчет"
+
     }
 
     override fun onResume() {
@@ -58,8 +59,8 @@ class MainActivity : ComponentActivity(),SensorEventListener {
     }
 
     override fun onDestroy() {
-        sensorManager.unregisterListener(this)
         super.onDestroy()
+        sensorManager.unregisterListener(this)
     }
 }
 
