@@ -1,9 +1,3 @@
-/* While this template provides a good starting point for using Wear Compose, you can always
- * take a look at https://github.com/android/wear-os-samples/tree/main/ComposeStarter and
- * https://github.com/android/wear-os-samples/tree/main/ComposeAdvanced to find the most up to date
- * changes to the libraries and their usages.
- */
-
 package ru.diserproject.healthdata.presentation
 
 import android.hardware.Sensor
@@ -18,8 +12,12 @@ import ru.diserproject.healthdata.R
 
 class MainActivity : ComponentActivity(),SensorEventListener {
     private lateinit var sensorManager: SensorManager
+    //UI
     private lateinit var heartTextView: TextView
-    private var sensor: Sensor? = null
+    private  lateinit var presureTextView: TextView
+    //Sensors
+    private var heartSensor: Sensor? = null
+    private var presureSensor: Sensor? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         installSplashScreen()
 
@@ -29,18 +27,23 @@ class MainActivity : ComponentActivity(),SensorEventListener {
         setContentView(R.layout.main_layout)
 
         heartTextView = findViewById<TextView>(R.id.heartRateTextView)
+        presureTextView = findViewById<TextView>(R.id.presureTextView)
 
         setUpSensor()
     }
 
     private fun setUpSensor(){
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
-        sensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)
+        heartSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)
+        presureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (event?.sensor?.type == Sensor.TYPE_HEART_RATE){
-            heartTextView.text = event.values[0].toString()
+            heartTextView.text = "Пульс: ${event.values[0].toString()}"
+        }
+        if (event?.sensor?.type == Sensor.TYPE_PRESSURE){
+            presureTextView.text = "Атм.Дав: ${event.values[0].toString()}"
         }
     }
 
@@ -50,12 +53,8 @@ class MainActivity : ComponentActivity(),SensorEventListener {
 
     override fun onResume() {
         super.onResume()
-        sensorManager.registerListener(
-            this,
-            sensor,
-            SensorManager.SENSOR_DELAY_NORMAL,
-            SensorManager.SENSOR_DELAY_UI)
-
+        sensorManager.registerListener(this,heartSensor,SensorManager.SENSOR_DELAY_NORMAL,SensorManager.SENSOR_DELAY_UI)
+        sensorManager.registerListener(this,presureSensor,SensorManager.SENSOR_DELAY_NORMAL,SensorManager.SENSOR_DELAY_UI)
     }
 
     override fun onDestroy() {
