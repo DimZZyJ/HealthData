@@ -9,10 +9,13 @@ import android.hardware.SensorManager
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
+import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import ru.diserproject.healthdata.R
+import ru.diserproject.healthdata.presentation.data.SensorData
+import ru.diserproject.healthdata.presentation.data.SensorRecord
 
 class MainActivity : ComponentActivity(),SensorEventListener {
     private lateinit var sensorManager: SensorManager
@@ -42,6 +45,9 @@ class MainActivity : ComponentActivity(),SensorEventListener {
     private var pressureSensor: Sensor? = null
     private var temperatureSensor: Sensor? = null
     private var humiditySensor:Sensor? = null
+    //Data
+    private var record : MutableList<SensorRecord> = mutableListOf<SensorRecord>()
+    private lateinit var data : SensorData
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,6 +61,8 @@ class MainActivity : ComponentActivity(),SensorEventListener {
         presureTextView = findViewById(R.id.pressureTextView)
         temperatureTextView = findViewById(R.id.tempepatureTextView)
         humidityTextView = findViewById(R.id.humidityTextView)
+
+        data = SensorData()
 
         _permissionList.forEach(){
             if (ContextCompat.checkSelfPermission(this,it) != PackageManager.PERMISSION_GRANTED)
@@ -74,6 +82,9 @@ class MainActivity : ComponentActivity(),SensorEventListener {
     override fun onDestroy() {
         super.onDestroy()
         sensorManager.unregisterListener(this)
+        if (record.any()){
+            Toast.makeText(this, "Sex", Toast.LENGTH_SHORT).show()
+        }
     }
     private fun requestPermission(){
         when{
@@ -105,10 +116,26 @@ class MainActivity : ComponentActivity(),SensorEventListener {
     }
     override fun onSensorChanged(event: SensorEvent?) {
         when (event?.sensor?.type){
-            Sensor.TYPE_HEART_RATE -> heartTextView.text = "Пульс: ${event.values[0]}"
-            Sensor.TYPE_PRESSURE -> presureTextView.text = "Атм.Дав: ${event.values[0]}"
-            Sensor.TYPE_AMBIENT_TEMPERATURE -> temperatureTextView.text = "Температура: ${event.values[0]}"
-            Sensor.TYPE_RELATIVE_HUMIDITY -> humidityTextView.text = "Влажность: ${event.values[0]}"
+            Sensor.TYPE_HEART_RATE -> {
+                heartTextView.text = "Пульс: ${event.values[0]}"
+                data.HeartRate = event.values[0]
+            }
+            Sensor.TYPE_PRESSURE -> {
+                presureTextView.text = "Атм.Дав: ${event.values[0]}"
+                data.Presure = event.values[0]
+            }
+            Sensor.TYPE_AMBIENT_TEMPERATURE -> {
+                temperatureTextView.text = "Температура: ${event.values[0]}"
+                data.AmbientTemp = event.values[0]
+            }
+            Sensor.TYPE_RELATIVE_HUMIDITY -> {
+                humidityTextView.text = "Влажность: ${event.values[0]}"
+                data.Humidity = event.values[0]
+            }
+        }
+        if (data.IsDataFull()){
+            record.add(SensorRecord(data))
+            data = SensorData()
         }
     }
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
