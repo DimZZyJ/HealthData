@@ -1,39 +1,18 @@
 package ru.diserproject.healthdata.presentation
 
-import android.Manifest
-import android.content.pm.PackageManager
 import android.hardware.Sensor
 import android.hardware.SensorEvent
 import android.hardware.SensorEventListener
 import android.hardware.SensorManager
 import android.os.Bundle
-import android.util.Log
 import android.widget.TextView
-import android.widget.Toast
 import androidx.activity.ComponentActivity
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.content.ContextCompat
 import ru.diserproject.healthdata.R
 import ru.diserproject.healthdata.presentation.data.SensorData
 import ru.diserproject.healthdata.presentation.data.SensorRecord
 
 class MainActivity : ComponentActivity(),SensorEventListener {
     private lateinit var sensorManager: SensorManager
-
-    private  val requestPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()){
-        isGranted: Boolean ->
-        if (isGranted)
-            Log.i("Permission","Granted")
-        else
-            Log.i("Permission","Denied")
-    }
-    //Permissions
-    private var _permissionList = listOf<String>(
-        Manifest.permission.BODY_SENSORS,
-        Manifest.permission.BODY_SENSORS_BACKGROUND,
-        Manifest.permission.WAKE_LOCK,
-    )
-    private var _problematicPermissions = mutableListOf<String>()
     //UI
     private lateinit var heartTextView: TextView
     private  lateinit var presureTextView: TextView
@@ -46,9 +25,10 @@ class MainActivity : ComponentActivity(),SensorEventListener {
     private var temperatureSensor: Sensor? = null
     private var humiditySensor:Sensor? = null
     //Data
-    private var record : MutableList<SensorRecord> = mutableListOf<SensorRecord>()
+    private var sensorDataList : MutableList<SensorRecord> = mutableListOf<SensorRecord>()
     private lateinit var data : SensorData
 
+    private lateinit var sensorList : List<Sensor>
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -63,16 +43,10 @@ class MainActivity : ComponentActivity(),SensorEventListener {
         humidityTextView = findViewById(R.id.humidityTextView)
 
         data = SensorData()
-
-        _permissionList.forEach(){
-            if (ContextCompat.checkSelfPermission(this,it) != PackageManager.PERMISSION_GRANTED)
-                _problematicPermissions.add(it)
-        }
     }
 
     override fun onStart() {
         super.onStart()
-        requestPermission()
         setUpSensor()
     }
     override fun onResume() {
@@ -82,23 +56,10 @@ class MainActivity : ComponentActivity(),SensorEventListener {
     override fun onDestroy() {
         super.onDestroy()
         sensorManager.unregisterListener(this)
-        if (record.any()){
-            Toast.makeText(this, "Sex", Toast.LENGTH_SHORT).show()
-        }
     }
-    private fun requestPermission(){
-        when{
-            !_problematicPermissions.any() -> {
-                // Разрешения получены
-            }
-            else -> {
-                _problematicPermissions.forEach(){
-                    requestPermissionLauncher.launch(it)
-                }
-            }
-        }
-    }
+
     private fun setUpSensor(){
+        sensorList = sensorManager.getSensorList(Sensor.TYPE_ALL)
         heartSensor = sensorManager.getDefaultSensor(Sensor.TYPE_HEART_RATE)
         pressureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_PRESSURE)
         temperatureSensor = sensorManager.getDefaultSensor(Sensor.TYPE_AMBIENT_TEMPERATURE)
@@ -134,7 +95,7 @@ class MainActivity : ComponentActivity(),SensorEventListener {
             }
         }
         if (data.IsDataFull()){
-            record.add(SensorRecord(data))
+            sensorDataList.add(SensorRecord(data))
             data = SensorData()
         }
     }
