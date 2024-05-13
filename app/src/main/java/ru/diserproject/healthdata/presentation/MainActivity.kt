@@ -27,6 +27,7 @@ class MainActivity : ComponentActivity(),SensorEventListener {
     //Data
     private var sensorDataList : MutableList<SensorRecord> = mutableListOf<SensorRecord>()
     private lateinit var data : SensorData
+    private var sensorDataDictionary: MutableMap<String,MutableList<Float>> = mutableMapOf()
 
     private lateinit var sensorList : List<Sensor>
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,11 +48,18 @@ class MainActivity : ComponentActivity(),SensorEventListener {
 
     override fun onStart() {
         super.onStart()
-        setUpSensor()
+        //setUpSensor()
+        availableSensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
+
+        availableSensors.forEach{
+            sensor ->
+            sensorDataDictionary[sensor.stringType] = mutableListOf()
+
+        }
+        registerAvailableSensors()
     }
     override fun onResume() {
         super.onResume()
-        registerAvailableSensors()
     }
     override fun onDestroy() {
         super.onDestroy()
@@ -69,8 +77,6 @@ class MainActivity : ComponentActivity(),SensorEventListener {
         if (pressureSensor != null) availableSensors.add(pressureSensor!!)
         if (temperatureSensor != null) availableSensors.add(temperatureSensor!!)
         if (humiditySensor != null) availableSensors.add(humiditySensor!!)
-
-        //var sensors = sensorManager.getSensorList(Sensor.TYPE_ALL)
     }
     private fun registerAvailableSensors(){
         availableSensors.forEach{ sensorManager.registerListener(this,it,SensorManager.SENSOR_DELAY_NORMAL,SensorManager.SENSOR_DELAY_UI)}
@@ -94,6 +100,11 @@ class MainActivity : ComponentActivity(),SensorEventListener {
                 data.Humidity = event.values[0]
             }
         }
+
+        if (event != null) {
+            sensorDataDictionary[event.sensor.stringType] = event.values.toMutableList()
+        }
+
         if (data.IsDataFull()){
             sensorDataList.add(SensorRecord(data))
             data = SensorData()
