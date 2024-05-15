@@ -14,10 +14,10 @@ class MainActivity : ComponentActivity(),SensorEventListener {
     private lateinit var sensorManager: SensorManager
     //UI
     private lateinit var statusTextView: TextView
-    private lateinit var heartTextView: TextView
-    private  lateinit var pressureTextView: TextView
-    private lateinit var temperatureTextView: TextView
-    private lateinit var humidityTextView: TextView
+//    private lateinit var heartTextView: TextView
+//    private  lateinit var pressureTextView: TextView
+//    private lateinit var temperatureTextView: TextView
+//    private lateinit var humidityTextView: TextView
     //Sensors
     private  var availableSensors = mutableListOf<Sensor>()
     //Data
@@ -31,10 +31,10 @@ class MainActivity : ComponentActivity(),SensorEventListener {
         sensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
 
         statusTextView = findViewById(R.id.statusTextView)
-        heartTextView = findViewById(R.id.heartRateTextView)
-        pressureTextView = findViewById(R.id.pressureTextView)
-        temperatureTextView = findViewById(R.id.tempepatureTextView)
-        humidityTextView = findViewById(R.id.humidityTextView)
+//        heartTextView = findViewById(R.id.heartRateTextView)
+//        pressureTextView = findViewById(R.id.pressureTextView)
+//        temperatureTextView = findViewById(R.id.tempepatureTextView)
+//        humidityTextView = findViewById(R.id.humidityTextView)
     }
 
     override fun onStart() {
@@ -59,7 +59,7 @@ class MainActivity : ComponentActivity(),SensorEventListener {
 
     override fun onSensorChanged(event: SensorEvent?) {
         statusTextView.text = "Идет запись..."
-        displayData(event)
+        //displayData(event)
         if (event != null) {
             sensorDataDictionary[event.sensor.stringType] = event.values.toMutableList()
         }
@@ -72,14 +72,14 @@ class MainActivity : ComponentActivity(),SensorEventListener {
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
 
     }
-    private fun displayData(event: SensorEvent?) {
-        when (event?.sensor?.type) {
-            Sensor.TYPE_HEART_RATE -> heartTextView.text = "Пульс: ${event.values[0]}"
-            Sensor.TYPE_PRESSURE -> pressureTextView.text = "Атм.Дав: ${event.values[0]}"
-            Sensor.TYPE_AMBIENT_TEMPERATURE -> temperatureTextView.text = "Температура: ${event.values[0]}"
-            Sensor.TYPE_RELATIVE_HUMIDITY -> humidityTextView.text = "Влажность: ${event.values[0]}"
-        }
-    }
+//    private fun displayData(event: SensorEvent?) {
+//        when (event?.sensor?.type) {
+//            Sensor.TYPE_HEART_RATE -> heartTextView.text = "Пульс: ${event.values[0]}"
+//            Sensor.TYPE_PRESSURE -> pressureTextView.text = "Атм.Дав: ${event.values[0]}"
+//            Sensor.TYPE_AMBIENT_TEMPERATURE -> temperatureTextView.text = "Температура: ${event.values[0]}"
+//            Sensor.TYPE_RELATIVE_HUMIDITY -> humidityTextView.text = "Влажность: ${event.values[0]}"
+//        }
+//    }
     private fun isDictionatyFull() : Boolean{
         var isFull = true
         sensorDataDictionary.values.forEach { valuesList ->
